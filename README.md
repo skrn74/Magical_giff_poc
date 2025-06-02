@@ -1,93 +1,165 @@
-# GoogleAI-Project
+# Giff Maker - Kubernetes Deployment on AWS EKS
+
+This repository provides a step-by-step guide to deploying the Giff Maker application on Amazon EKS using Kubernetes. It includes Docker configurations, Kubernetes manifests, and troubleshooting steps encountered during the deployment process.
+
+## 🛠️ Technologies Used
+
+- **Frontend**: Node.js with Nginx
+- **Containerization**: Docker
+- **Orchestration**: Kubernetes on Amazon EKS
+- **Container Registry**: Amazon ECR
+
+## 📦 Project Structure
+
+giff-maker-k8s-deployment/
+
+giff-maker-k8s-deployment/
+├── Dockerfile
+├── k8s/
+│   ├── deployment.yaml
+│   └── service.yaml
+├── troubleshooting/
+│   ├── issues-faced.md
+│   └── resolution-steps.md
+├── README.md
+├── .gitignore
+└── LICENSE (optional)
 
 
 
-## Getting started
+## 🚀 Deployment Steps
 
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
+### 1. Clone the Repository
 
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
+```bash
+git clone https://github.com/your-username/giff-maker-k8s-deployment.git
+cd giff-maker-k8s-deployment
+git add .
+git commit -m "new commit"
+git push
 
-## Add your files
+**### 2. Build and Push Docker Image to ECR**
 
-- [ ] [Create](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#create-a-file) or [upload](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#upload-a-file) files
-- [ ] [Add files using the command line](https://docs.gitlab.com/topics/git/add_files/#add-files-to-a-git-repository) or push an existing Git repository with the following command:
+# Authenticate Docker to your ECR registry
+aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin <your-account-id>.dkr.ecr.us-east-1.amazonaws.com
 
-```
-cd existing_repo
-git remote add origin https://gitlab.com/skrn74/googleai-project.git
-git branch -M main
-git push -uf origin main
-```
+# Build the Docker image
+docker build -t giff-maker .
 
-## Integrate with your tools
+# Tag the image
+docker tag giff-maker:latest <your-account-id>.dkr.ecr.us-east-1.amazonaws.com/giff-maker:latest
 
-- [ ] [Set up project integrations](https://gitlab.com/skrn74/googleai-project/-/settings/integrations)
+# Push the image to ECR
+docker push <your-account-id>.dkr.ecr.us-east-1.amazonaws.com/giff-maker:latest
+### 3. Deploy to Amazon EKS
+bash
+Copy
+Edit
+# Apply Kubernetes manifests
+kubectl apply -f k8s/deployment.yaml
+kubectl apply -f k8s/service.yaml
+4. Access the Application
+bash
+Copy
+Edit
+# Port-forward the service to access it locally
+kubectl port-forward svc/giff-maker-service 8080:80
+Open your browser and navigate to http://localhost:8080 to access the application.
 
-## Collaborate with your team
+🐞 Troubleshooting
+Detailed information about issues encountered during the deployment and their resolutions can be found in the troubleshooting directory.
 
-- [ ] [Invite team members and collaborators](https://docs.gitlab.com/ee/user/project/members/)
-- [ ] [Create a new merge request](https://docs.gitlab.com/ee/user/project/merge_requests/creating_merge_requests.html)
-- [ ] [Automatically close issues from merge requests](https://docs.gitlab.com/ee/user/project/issues/managing_issues.html#closing-issues-automatically)
-- [ ] [Enable merge request approvals](https://docs.gitlab.com/ee/user/project/merge_requests/approvals/)
-- [ ] [Set auto-merge](https://docs.gitlab.com/user/project/merge_requests/auto_merge/)
+📄 License
+This project is licensed under the MIT License - see the LICENSE file for details.
 
-## Test and Deploy
+yaml
+Copy
+Edit
 
-Use the built-in continuous integration in GitLab.
+---
 
-- [ ] [Get started with GitLab CI/CD](https://docs.gitlab.com/ee/ci/quick_start/)
-- [ ] [Analyze your code for known vulnerabilities with Static Application Security Testing (SAST)](https://docs.gitlab.com/ee/user/application_security/sast/)
-- [ ] [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/ee/topics/autodevops/requirements.html)
-- [ ] [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/ee/user/clusters/agent/)
-- [ ] [Set up protected environments](https://docs.gitlab.com/ee/ci/environments/protected_environments.html)
+## 🐛 Troubleshooting Documentation
 
-***
+Create a `troubleshooting` directory with two markdown files:
 
-# Editing this README
+### `issues-faced.md`
 
-When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!). Thanks to [makeareadme.com](https://www.makeareadme.com/) for this template.
+```markdown
+# Issues Faced During Deployment
 
-## Suggestions for a good README
+## 1. CNI Plugin Not Initialized
 
-Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
+- **Error**: `cni plugin not initialized`
+- **Cause**: The Amazon VPC CNI plugin was not installed.
+- **Resolution**: Installed the VPC CNI plugin via the EKS Add-ons page in the AWS Management Console.
 
-## Name
-Choose a self-explaining name for your project.
+## 2. Port-Forwarding Connection Refused
 
-## Description
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
+- **Error**: `error forwarding port 3000 to pod ... connect: connection refused`
+- **Cause**: The container was exposing port 80, but the service was forwarding to port 3000.
+- **Resolution**: Updated the service to forward to port 80, matching the container's exposed port.
 
-## Badges
-On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
+## 3. Static Content Loading Without Functionality
 
-## Visuals
-Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
+- **Issue**: The application loaded statically without interactive functionality.
+- **Cause**: The frontend was making API calls to `localhost`, which doesn't resolve correctly within the container.
+- **Resolution**: Updated the frontend to use relative paths or environment variables for API endpoints.
+resolution-steps.md
+markdown
+Copy
+Edit
+# Resolution Steps
 
-## Installation
-Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
+## Installing VPC CNI Plugin
 
-## Usage
-Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
+1. Navigate to the EKS cluster in the AWS Management Console.
+2. Go to the "Add-ons" section.
+3. Click "Create add-on".
+4. Select "Amazon VPC CNI" and proceed with the installation.
 
-## Support
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
+## Updating Service Port Configuration
 
-## Roadmap
-If you have ideas for releases in the future, it is a good idea to list them in the README.
+1. Open `k8s/service.yaml`.
+2. Ensure the `targetPort` matches the container's exposed port (80).
+3. Apply the updated service configuration:
 
-## Contributing
-State if you are open to contributions and what your requirements are for accepting them.
+```bash
+kubectl apply -f k8s/service.yaml
+Configuring Frontend API Endpoints
+Update the frontend code to use relative paths for API calls.
 
-For people who want to make changes to your project, it's helpful to have some documentation on how to get started. Perhaps there is a script that they should run or some environment variables that they need to set. Make these steps explicit. These instructions could also be useful to your future self.
+Rebuild the Docker image:
 
-You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce the likelihood that the changes inadvertently break something. Having instructions for running tests is especially helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
+bash
+Copy
+Edit
+docker build -t giff-maker .
+Push the updated image to ECR:
 
-## Authors and acknowledgment
-Show your appreciation to those who have contributed to the project.
+bash
+Copy
+Edit
+docker push <your-account-id>.dkr.ecr.us-east-1.amazonaws.com/giff-maker:latest
+Update the deployment to use the new image:
 
-## License
-For open source projects, say how it is licensed.
+bash
+Copy
+Edit
+kubectl set image deployment/giff-maker-deployment giff-maker=<your-account-id>.dkr.ecr.us-east-1.amazonaws.com/giff-maker:latest
+yaml
+Copy
+Edit
 
-## Project status
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
+---
+
+Feel free to customize the repository and documentation further to suit your project's needs. If you require assistance with any specific section or have additional questions, don't hesitate to ask!
+::contentReference[oaicite:0]{index=0}
+ 
+
+
+
+
+
+
+Sources
+
