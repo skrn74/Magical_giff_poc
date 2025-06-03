@@ -29,7 +29,7 @@ giff-maker-k8s-deployment/
 
 ## 🚀 Deployment Steps
 
-### 1. Clone the Repository
+1. Clone the Repository
 
 ```bash
 git clone https://github.com/your-username/giff-maker-k8s-deployment.git
@@ -38,7 +38,7 @@ git add .
 git commit -m "new commit"
 git push
 
-### 2. Build and Push Docker Image to ECR
+2. Build and Push Docker Image to ECR
 
 # Authenticate Docker to your ECR registry
 aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin <your-account-id>.dkr.ecr.us-east-1.amazonaws.com
@@ -51,17 +51,15 @@ docker tag giff-maker:latest <your-account-id>.dkr.ecr.us-east-1.amazonaws.com/g
 
 # Push the image to ECR
 docker push <your-account-id>.dkr.ecr.us-east-1.amazonaws.com/giff-maker:latest
-### 3. Deploy to Amazon EKS
-bash
-Copy
-Edit
+
+3. Deploy to Amazon EKS:
+
 # Apply Kubernetes manifests
 kubectl apply -f k8s/deployment.yaml
 kubectl apply -f k8s/service.yaml
+
 4. Access the Application
-bash
-Copy
-Edit
+
 # Port-forward the service to access it locally
 kubectl port-forward svc/giff-maker-service 8080:80
 Open your browser and navigate to http://localhost:8080 to access the application.
@@ -71,10 +69,6 @@ Detailed information about issues encountered during the deployment and their re
 
 📄 License
 This project is licensed under the MIT License - see the LICENSE file for details.
-
-yaml
-Copy
-Edit
 
 ---
 
