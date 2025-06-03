@@ -38,7 +38,7 @@ git add .
 git commit -m "new commit"
 git push
 
-**### 2. Build and Push Docker Image to ECR**
+### 2. Build and Push Docker Image to ECR
 
 # Authenticate Docker to your ECR registry
 aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin <your-account-id>.dkr.ecr.us-east-1.amazonaws.com
