@@ -98,10 +98,9 @@ Create a `troubleshooting` directory with two markdown files:
 - **Issue**: The application loaded statically without interactive functionality.
 - **Cause**: The frontend was making API calls to `localhost`, which doesn't resolve correctly within the container.
 - **Resolution**: Updated the frontend to use relative paths or environment variables for API endpoints.
+
 resolution-steps.md
-markdown
-Copy
-Edit
+
 # Resolution Steps
 
 ## Installing VPC CNI Plugin
@@ -124,36 +123,11 @@ Update the frontend code to use relative paths for API calls.
 
 Rebuild the Docker image:
 
-bash
-Copy
-Edit
 docker build -t giff-maker .
 Push the updated image to ECR:
 
-bash
-Copy
-Edit
 docker push <your-account-id>.dkr.ecr.us-east-1.amazonaws.com/giff-maker:latest
 Update the deployment to use the new image:
 
-bash
-Copy
-Edit
 kubectl set image deployment/giff-maker-deployment giff-maker=<your-account-id>.dkr.ecr.us-east-1.amazonaws.com/giff-maker:latest
-yaml
-Copy
-Edit
-
----
-
-Feel free to customize the repository and documentation further to suit your project's needs. If you require assistance with any specific section or have additional questions, don't hesitate to ask!
-::contentReference[oaicite:0]{index=0}
- 
-
-
-
-
-
-
-Sources
 
